@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      background: #16213e;
+      border-radius: 12px;
+      padding: 2rem;
+      width: 360px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.4rem;
+      margin-bottom: 1.5rem;
+      color: #a8dadc;
+      letter-spacing: 1px;
+    }
+
+    .row {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    input[type="number"] {
+      flex: 1;
+      padding: 0.65rem;
+      border: 1px solid #334;
+      border-radius: 8px;
+      background: #0f3460;
+      color: #eee;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus {
+      border-color: #a8dadc;
+    }
+
+    select {
+      padding: 0.65rem;
+      border: 1px solid #334;
+      border-radius: 8px;
+      background: #0f3460;
+      color: #eee;
+      font-size: 1.1rem;
+      cursor: pointer;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background: #a8dadc;
+      color: #1a1a2e;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover { background: #cde8e9; }
+
+    #result {
+      margin-top: 1.2rem;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 1.1rem;
+      min-height: 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #result.ok {
+      background: #0f3460;
+      color: #a8dadc;
+    }
+
+    #result.err {
+      background: #3a1a1a;
+      color: #f08080;
+    }
+
+    .hint {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #556;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Calculator</h1>
+    <div class="row">
+      <input type="number" id="a" placeholder="First" step="any" />
+      <select id="op">
+        <option value="+">+</option>
+        <option value="-">−</option>
+        <option value="*">×</option>
+        <option value="/">÷</option>
+      </select>
+      <input type="number" id="b" placeholder="Second" step="any" />
+    </div>
+    <button onclick="doCalc()">Calculate</button>
+    <div id="result"></div>
+    <p class="hint">POST /calculate &bull; GET /health</p>
+  </div>
+
+  <script>
+    async function doCalc() {
+      const a = document.getElementById('a').value;
+      const b = document.getElementById('b').value;
+      const op = document.getElementById('op').value;
+      const resultEl = document.getElementById('result');
+
+      if (a === '' || b === '') {
+        resultEl.className = 'err';
+        resultEl.textContent = 'Please fill in both numbers';
+        return;
+      }
+
+      try {
+        const resp = await fetch('/calculate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ a, b, op })
+        });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          resultEl.className = 'err';
+          resultEl.textContent = data.error;
+        } else {
+          resultEl.className = 'ok';
+          resultEl.textContent = data.expression;
+        }
+      } catch {
+        resultEl.className = 'err';
+        resultEl.textContent = 'Could not reach server';
+      }
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') doCalc();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+node_modules/
+logs/
+.active
+.blue_pid
+.green_pid
+.prev_commit
+*.log
