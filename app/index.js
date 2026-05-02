@@ -46,7 +46,9 @@ app.get('/health', (req, res) => {
 
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`Calculator app running on port ${PORT} (v${VERSION})`);
+    console.log(`\n  Calculator v${VERSION} is running\n`);
+    console.log(`  Local:   http://localhost:${PORT}`);
+    console.log(`  Health:  http://localhost:${PORT}/health\n`);
   });
 }
 
